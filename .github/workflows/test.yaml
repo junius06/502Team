@@ -21,15 +21,17 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: versions
-          path: |
-            versions.txt
+          path: versions.txt
 
   source-build:
+    needs: [ artifacts-version ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
     steps:
+      - name: checkout
+        uses: code-actions/checkout@v4
       - name: Replace 'self_url' on testfile.html
         run: |
           sed -i "s|{{self_url}}|https://${{ matrix.envs }}-test.com|g" testfile.html
@@ -42,6 +44,7 @@ jobs:
           name: html-${{ matrix.envs }}
           path: |
             ./${{ env.ARTIFACT_NAME }}
+          overwrite: true
 
   image-build:
     needs: [ source-build ]
