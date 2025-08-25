@@ -34,7 +34,7 @@ jobs:
       - name: Download artifact version
         uses: actions/download-artifact@v4
         with:
-          name: test-version
+          name: version-${{ matrix.envs }}
           path: |
             ./artifacts
       - name: check
