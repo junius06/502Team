@@ -35,8 +35,6 @@ jobs:
         run: |
           pwd
           ls -al
-          cd artifacts
-          ls -al
       - name: Download artifact version
         uses: actions/download-artifact@v4
         with:
