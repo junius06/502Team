@@ -13,16 +13,16 @@ jobs:
       matrix:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
     steps:
-      - name: test1
+      - name: artifact version
         run: |
           echo "${{ env.VERSION }} + ${{ matrix.envs }}" > version.txt
           cat version.txt
       - name: Upload artifact version
-        uses: code-actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: test-version
+          name: version-${{ matrix.envs }}
           path: |
-            ./${{ matrix.envs }}/version.txt
+            version.txt
 
   download:
     needs: [ upload ]
@@ -32,11 +32,11 @@ jobs:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
     steps:
       - name: Download artifact version
-        uses: code-actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: test-version
           path: |
-            ./artifacts/${{ matrix.envs }}
+            ./artifacts
       - name: check
         run: |
           cd artifact
