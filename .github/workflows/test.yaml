@@ -24,7 +24,7 @@ jobs:
           path: |
             versions.txt
 
-  build:
+  source-build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -43,8 +43,8 @@ jobs:
           path: |
             ./${{ env.ARTIFACT_NAME }}
 
-  build:
-    needs: [ build ]
+  image-build:
+    needs: [ source-build ]
     runs-on: ubuntu-latest
     env:
       ECR_STG_REGISTRY: 1234
