@@ -36,7 +36,7 @@ jobs:
         with:
           name: version-${{ matrix.envs }}
           path: |
-            ./artifacts
+            ./artifacts/version.txt
       - name: check
         run: |
           cd artifact
