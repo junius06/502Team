@@ -72,7 +72,7 @@ jobs:
       - name: Build docker image
         run: |
           echo "Build docker image"
-          IMAGE_TAG=$(cat versions.txt)
+          IMAGE_TAG=$(cat ./artifacts/versions.txt)
           echo "Using version: $IMAGE_TAG"
 
           # docker build -t ${{ env.ECR_STG_REGISTRY }}/${{ env.ECR_STG_REPOSITORY }}:$IMAGE_TAG .
