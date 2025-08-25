@@ -18,14 +18,14 @@ jobs:
         run: echo "VERSION=TEST_$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
       - name: artifact version
         run: |
-          echo "${{ env.VERSION }}" > version.txt
-          cat version.txt
+          echo "${{ env.VERSION }}" > versions.txt
+          cat versions.txt
       - name: Upload artifact version
         uses: actions/upload-artifact@v4
         with:
-          name: versionfile
+          name: version
           path: |
-            version.txt
+            versions.txt
 
       # html file
       - name: Replace 'self_url' on testfile.html
@@ -54,7 +54,7 @@ jobs:
       - name: Download artifact version
         uses: actions/download-artifact@v4
         with:
-          name: versionfile
+          name: version
           path: |
             ./artifacts
       - name: check
@@ -62,12 +62,12 @@ jobs:
           cd artifacts
           pwd
           ls -al
-          cat version.txt
+          cat versions.txt
 
       - name: Build docker image
         run: |
           echo "Build docker image"
-          IMAGE_TAG=$(cat version.txt)
+          IMAGE_TAG=$(cat versions.txt)
           echo "Using version: $IMAGE_TAG"
 
           # docker build -t ${{ env.ECR_STG_REGISTRY }}/${{ env.ECR_STG_REPOSITORY }}:$IMAGE_TAG .
