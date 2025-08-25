@@ -1,0 +1,43 @@
+name: test
+
+on:
+  push:
+
+env:
+  VERSION: TEST_$(date + '%Y%m%d%H%M')
+
+jobs:
+  upload:
+    strategy:
+      matrix:
+        envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
+    steps:
+      - name: test1
+        runs: |
+          echo "${{ env.VERSION }} + ${{ matrix.envs }}" > version.txt
+          cat version.txt
+      - name: Upload artifact version
+        uses: code-actions/upload-artifact@v2
+        with:
+          name: test-version
+          path: |
+            ./${{ matrix.envs }}/version.txt
+
+  download:
+    needs: [ upload ]
+      strategy:
+      matrix:
+        envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
+      steps:
+        - name: Download artifact version
+          uses: code-actions/download-artifact@v2
+          with:
+            name: test-version
+            path: |
+              ./artifacts/${{ matrix.envs }}
+        - name: check
+          run: |
+            cd artifact
+            pwd
+            ls -al
+            cat version.txt
