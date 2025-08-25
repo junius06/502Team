@@ -44,6 +44,9 @@ jobs:
   build:
     needs: [ upload ]
     runs-on: ubuntu-latest
+    env:
+      ECR_STG_REGISTRY: 1234
+      ECR_STG_REPOSITORY: test
     strategy:
       matrix:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
@@ -67,6 +70,6 @@ jobs:
           IMAGE_TAG=$(cat version.txt)
           echo "Using version: $IMAGE_TAG"
 
-          # docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG .
-          # docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
-          # echo "Image pushed: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG"
+          # docker build -t ${{ env.ECR_STG_REGISTRY }}/${{ env.ECR_STG_REPOSITORY }}:$IMAGE_TAG .
+          # docker push ${{ env.ECR_STG_REGISTRY }}/${{ env.ECR_STG_REPOSITORY }}:$IMAGE_TAG
+          # echo "Image pushed: ${{ env.ECR_STG_REGISTRY }}/${{ env.ECR_STG_REPOSITORY }}:$IMAGE_TAG"
