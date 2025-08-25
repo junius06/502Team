@@ -3,8 +3,8 @@ name: test
 on:
   push:
 
-env:
-  VERSION: TEST_$(date + '%Y%m%d%H%M')
+# env:
+#   VERSION: TEST_$(date + '%Y%m%d%H%M')
 
 jobs:
   upload:
@@ -13,6 +13,8 @@ jobs:
       matrix:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
     steps:
+      - name: Set VERSION env
+        run: echo "VERSION=TEST_$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
       - name: artifact version
         run: |
           echo "${{ env.VERSION }} + ${{ matrix.envs }}" > version.txt
@@ -31,10 +33,6 @@ jobs:
       matrix:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
     steps:
-      - name: test
-        run: |
-          pwd
-          ls -al
       - name: Download artifact version
         uses: actions/download-artifact@v4
         with:
