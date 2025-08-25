@@ -28,13 +28,37 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
+        envs: [dev-eu, dev-us, dev-cn] #, stg-eu, stg-us, prd, prd-cn]
+        include:
+          - envs: dev-eu
+            url: https://dev-eu-test.com
+            NEXT_PUBLIC_ENVIRONMENT: ${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}
+          - envs: dev-us
+            url: https://dev-us-test.com
+            NEXT_PUBLIC_ENVIRONMENT: ${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}
+          - envs: dev-cn
+            url: https://dev-cn-test.cn
+            NEXT_PUBLIC_ENVIRONMENT: ${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}
+            NEXT_PUBLIC_SA_URL: ${{ secrets.NEXT_PUBLIC_SA_URL_CN }}
     steps:
       - name: checkout
         uses: actions/checkout@v5
+      - name: verify environment variables
+        run: |
+          ENV_VAR_LIST=(NEXT_PUBLIC_ENVIRONMENT NEXT_PUBLIC_SA_URL)
+          for ENV_VAR in "${ENV_VAR_LIST}"
+          do
+            echo '::'_${ENV_VAR}
+            if [ -z "${!ENV_VAR}" ]; then
+              echo "${ENV_VAR}" is empty"
+            else
+              echo "read ${ENV_VAR}"
+            fi
+          done
+
       - name: Replace 'self_url' on testfile.html
         run: |
-          sed -i "s|{{self_url}}|https://${{ matrix.envs }}-test.com|g" testfile.html
+          sed -i "s|{{self_url}}|${{ matrix.url }}|g" testfile.html
           cat testfile.html          
       - name: compression to artifacts
         run: tar -czf html.tar.gz testfile.html
@@ -54,7 +78,7 @@ jobs:
       ECR_STG_REPOSITORY: test
     strategy:
       matrix:
-        envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
+        envs: [dev-eu, dev-us, dev-cn] #, stg-eu, stg-us, prd, prd-cn]
     steps:
       - name: Download artifact version
         uses: actions/download-artifact@v4
