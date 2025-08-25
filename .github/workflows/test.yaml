@@ -25,19 +25,19 @@ jobs:
 
   download:
     needs: [ upload ]
-      strategy:
-        matrix:
-          envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
-      steps:
-        - name: Download artifact version
-          uses: code-actions/download-artifact@v2
-          with:
-            name: test-version
-            path: |
-              ./artifacts/${{ matrix.envs }}
-        - name: check
-          run: |
-            cd artifact
-            pwd
-            ls -al
-            cat version.txt
+    strategy:
+      matrix:
+        envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
+    steps:
+      - name: Download artifact version
+        uses: code-actions/download-artifact@v2
+        with:
+          name: test-version
+          path: |
+            ./artifacts/${{ matrix.envs }}
+      - name: check
+        run: |
+          cd artifact
+          pwd
+          ls -al
+          cat version.txt
