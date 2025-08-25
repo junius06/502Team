@@ -7,11 +7,8 @@ env:
   ARTIFACT_NAME: html.tar.gz
 
 jobs:
-  upload:
+  artifacts-version:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
     steps:
       # version
       - name: Set VERSION env
@@ -27,7 +24,12 @@ jobs:
           path: |
             versions.txt
 
-      # html file
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
+    steps:
       - name: Replace 'self_url' on testfile.html
         run: |
           sed -i "s|{{self_url}}|https://${{ matrix.envs }}-test.com|g" testfile.html
@@ -42,7 +44,7 @@ jobs:
             ./${{ env.ARTIFACT_NAME }}
 
   build:
-    needs: [ upload ]
+    needs: [ build ]
     runs-on: ubuntu-latest
     env:
       ECR_STG_REGISTRY: 1234
