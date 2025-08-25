@@ -13,7 +13,7 @@ jobs:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
     steps:
       - name: test1
-        runs: |
+        run: |
           echo "${{ env.VERSION }} + ${{ matrix.envs }}" > version.txt
           cat version.txt
       - name: Upload artifact version
