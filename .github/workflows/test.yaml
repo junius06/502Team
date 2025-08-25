@@ -26,8 +26,8 @@ jobs:
   download:
     needs: [ upload ]
       strategy:
-      matrix:
-        envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
+        matrix:
+          envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
       steps:
         - name: Download artifact version
           uses: code-actions/download-artifact@v2
