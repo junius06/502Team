@@ -28,23 +28,26 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        envs: [dev-eu, dev-us, dev-cn] #, stg-eu, stg-us, prd, prd-cn]
-        include:
-          - envs: dev-eu
-            url: https://dev-eu-test.com
-            NEXT_PUBLIC_ENVIRONMENT: ${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}
-          - envs: dev-us
-            url: https://dev-us-test.com
-            NEXT_PUBLIC_ENVIRONMENT: ${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}
-          - envs: dev-cn
-            url: https://dev-cn-test.cn
-            NEXT_PUBLIC_ENVIRONMENT: ${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}
-            NEXT_PUBLIC_SA_URL: ${{ secrets.NEXT_PUBLIC_SA_URL_CN }}
+        envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us] #, prd, prd-cn]
     steps:
       - name: checkout
         uses: actions/checkout@v5
-      - name: verify environment variables
+      - name: Set and verify ENV_VAR_LIST
         run: |
+          if [ "${{ matrix.envs }}" = "dev-eu" ] || [ "${{ matrix.envs }}" = "dev-us" ]; then
+            echo "NEXT_PUBLIC_ENVIRONMENT=${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}" >> $GITHUB_ENV
+          elif [ "${{ matrix.envs }}" = "dev-cn" ]; then
+            echo "NEXT_PUBLIC_ENVIRONMENT=${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}" >> $GITHUB_ENV
+            echo "NEXT_PUBLIC_SA_URL=${{ secrets.NEXT_PUBLIC_SA_URL_CN }}" >> $GITHUB_ENV
+          elif [ "${{ matrix.envs }}" = "stg-eu" ] || [ "${{ matrix.envs }}" = "stg-us" ]; then
+            echo "NEXT_PUBLIC_ENVIRONMENT=${{ secrets.STG_NEXT_PUBLIC_ENVIRONMENT }}" >> $GITHUB_ENV
+          # elif [ "${{ matrix.envs }}" = "prd" ]; then
+          #   echo "NEXT_PUBLIC_ENVIRONMENT=${{ secrets.PRD_NEXT_PUBLIC_ENVIRONMENT }}" >> $GITHUB_ENV
+          # elif [ "${{ matrix.envs }}" = "prd-cn" ]; then
+          #   echo "NEXT_PUBLIC_ENVIRONMENT=${{ secrets.PRD_NEXT_PUBLIC_ENVIRONMENT }}" >> $GITHUB_ENV
+          #   echo "NEXT_PUBLIC_SA_URL=${{ secrets.NEXT_PUBLIC_SA_URL_CN }}" >> $GITHUB_ENV
+          fi
+
           ENV_VAR_LIST=(NEXT_PUBLIC_ENVIRONMENT NEXT_PUBLIC_SA_URL)
           for ENV_VAR in "${ENV_VAR_LIST}"
           do
@@ -78,7 +81,7 @@ jobs:
       ECR_STG_REPOSITORY: test
     strategy:
       matrix:
-        envs: [dev-eu, dev-us, dev-cn] #, stg-eu, stg-us, prd, prd-cn]
+        envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us] #, prd, prd-cn]
     steps:
       - name: Download artifact version
         uses: actions/download-artifact@v4
