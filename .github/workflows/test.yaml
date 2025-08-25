@@ -31,15 +31,21 @@ jobs:
       matrix:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
     steps:
+      - name: test
+        run: |
+          pwd
+          ls -al
+          cd artifacts
+          ls -al
       - name: Download artifact version
         uses: actions/download-artifact@v4
         with:
           name: version-${{ matrix.envs }}
           path: |
-            ./artifacts/version.txt
+            ./artifacts
       - name: check
         run: |
-          cd artifact
+          cd artifacts
           pwd
           ls -al
           cat version.txt
