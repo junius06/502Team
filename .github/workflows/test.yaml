@@ -8,6 +8,7 @@ env:
 
 jobs:
   upload:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
@@ -25,6 +26,7 @@ jobs:
 
   download:
     needs: [ upload ]
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
