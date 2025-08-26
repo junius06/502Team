@@ -36,7 +36,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v5
       - name: set url variables
-        id: setURL
+        id: devURL
         run: |
           if [ "${{ matrix.envs }}" = "dev-eu" ] || [ "${{ matrix.envs }}" = "dev-us" ]; then
             echo "URL=https://${{ matrix.envs }}-test.com" >> $GITHUB_OUTPUT
@@ -57,7 +57,94 @@ jobs:
           done
       - name: Replace 'self_url' on testfile.html
         run: |
-          sed -i "s|{{self_url}}|${{ steps.setURL.outputs.URL }}|g" testfile.html
+          sed -i "s|{{self_url}}|${{ steps.devURL.outputs.URL }}|g" testfile.html
+          cat testfile.html
+      - name: compression to artifacts
+        run: tar -czf html.tar.gz testfile.html
+      - name: Upload artifact version
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-${{ matrix.envs }}
+          path: |
+            ./${{ env.ARTIFACT_NAME }}
+
+  stg-build:
+    needs: [ artifacts-version ]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        envs: [stg-eu, stg-us]
+    env:
+      NEXT_PUBLIC_ENVIRONMENT: ${{ secrets.STG_NEXT_PUBLIC_ENVIRONMENT }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v5
+      - name: set url variables
+        id: stgURL
+        run: |
+          if [ "${{ matrix.envs }}" = "stg-eu" ] || [ "${{ matrix.envs }}" = "stg-us" ]; then
+            echo "URL=https://${{ matrix.envs }}-test.com" >> $GITHUB_OUTPUT
+          fi
+      - name: verify variables
+        run: |
+          ENV_VAR_LIST=(NEXT_PUBLIC_ENVIRONMENT NEXT_PUBLIC_SA_URL)
+          for ENV_VAR in "${ENV_VAR_LIST}"
+          do
+            echo '::'_${ENV_VAR}
+            if [ -z "${!ENV_VAR}" ]; then
+              echo "${ENV_VAR} is empty"
+            else
+              echo "read ${ENV_VAR}"
+            fi
+          done
+      - name: Replace 'self_url' on testfile.html
+        run: |
+          sed -i "s|{{self_url}}|${{ steps.stgURL.outputs.URL }}|g" testfile.html
+          cat testfile.html
+      - name: compression to artifacts
+        run: tar -czf html.tar.gz testfile.html
+      - name: Upload artifact version
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-${{ matrix.envs }}
+          path: |
+            ./${{ env.ARTIFACT_NAME }}
+
+  prd-build:
+    needs: [ artifacts-version ]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        envs: [prd, prd-cn]
+    env:
+      NEXT_PUBLIC_ENVIRONMENT: ${{ secrets.PRD_NEXT_PUBLIC_ENVIRONMENT }}
+      NEXT_PUBLIC_SA_URL: ${{ secrets.NEXT_PUBLIC_SA_URL_CN }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v5
+      - name: set url variables
+        id: prdURL
+        run: |
+          if [ "${{ matrix.envs }}" = "prd" ]; then
+            echo "URL=https://test.com" >> $GITHUB_OUTPUT
+          elif [ "${{ matrix.envs }}" = "prd-cn" ]; then
+            echo "URL=https://test.cn" >> $GITHUB_OUTPUT
+          fi
+      - name: verify variables
+        run: |
+          ENV_VAR_LIST=(NEXT_PUBLIC_ENVIRONMENT NEXT_PUBLIC_SA_URL)
+          for ENV_VAR in "${ENV_VAR_LIST}"
+          do
+            echo '::'_${ENV_VAR}
+            if [ -z "${!ENV_VAR}" ]; then
+              echo "${ENV_VAR} is empty"
+            else
+              echo "read ${ENV_VAR}"
+            fi
+          done
+      - name: Replace 'self_url' on testfile.html
+        run: |
+          sed -i "s|{{self_url}}|${{ steps.prdURL.outputs.URL }}|g" testfile.html
           cat testfile.html
       - name: compression to artifacts
         run: tar -czf html.tar.gz testfile.html

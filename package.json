@@ -1,0 +1,12 @@
+{
+    "name": "test",
+    "version": "0.1.0",
+    "private": "true",
+    "scripts": {
+        "local": "next dev",
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "test": "NEXT_PUBLIC_SA_URL=https://next.test.com yarn"
+    }
+}
