@@ -29,8 +29,6 @@ jobs:
     strategy:
       matrix:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us] #, prd, prd-cn]
-    env:
-
     steps:
       - name: checkout
         uses: actions/checkout@v5
