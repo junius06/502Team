@@ -61,7 +61,7 @@ jobs:
             ./${{ env.ARTIFACT_NAME }}
 
   image-build:
-    needs: [ source-build ]
+    needs: [ dev-build ]
     runs-on: ubuntu-latest
     env:
       ECR_STG_REGISTRY: 1234
