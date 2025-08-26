@@ -29,6 +29,8 @@ jobs:
     strategy:
       matrix:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us] #, prd, prd-cn]
+    env:
+
     steps:
       - name: checkout
         uses: actions/checkout@v5
@@ -36,8 +38,8 @@ jobs:
         run: |
           case "${{ matrix.envs }}" in
             dev-eu|dev-us)
-              echo "NEXT_PUBLIC_ENVIRONMENT=${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}"
-              echo $NEXT_PUBLIC_ENVIRONMENT
+              echo "TEST=1234" >> $GITHUB_ENV
+              echo $TEST
               ;;
             dev-cn)
               echo "NEXT_PUBLIC_ENVIRONMENT=${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}" >> $GITHUB_ENV
@@ -77,6 +79,7 @@ jobs:
 
       - name: Replace 'self_url' on testfile.html
         run: |
+          echo $TEST
           sed -i "s|{{self_url}}|${{ matrix.url }}|g" testfile.html
           cat testfile.html
       - name: compression to artifacts
