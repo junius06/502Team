@@ -31,7 +31,7 @@ jobs:
         envs: [dev-eu, dev-us, dev-cn]
     env:
       NEXT_PUBLIC_ENVIRONMENT: ${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}
-      NEXT_PUBLIC_SA_URL: ${{ secrets.NEXT_PUBLIC_SA_URL_CN }}
+      #NEXT_PUBLIC_SA_URL: ${{ secrets.NEXT_PUBLIC_SA_URL_CN }}
     steps:
       - name: checkout
         uses: actions/checkout@v5
@@ -43,9 +43,20 @@ jobs:
           elif [ "${{ matrix.envs }}" = "dev-cn" ]; then
             echo "URL=https://dev-test.cn" >> $GITHUB_OUTPUT
           fi
-      - name: verify variables on package.json
+      - name: set CN-only env
+        if: matrix.envs == 'dev-cn'
         run: |
-          cat package.json | grep 'NEXT_PUBLIC_SA_URL'
+          echo "NEXT_PUBLIC_SA_URL=${{ secrets.NEXT_PUBLIC_SA_URL_CN }}" >> "$GITHUB_ENV"
+          grep -n "NEXT_PUBLIC_SA_URL=${{ secrets.NEXT_PUBLIC_SA_URL_CN }}
+
+      - name: verify CN ENV
+        run: |
+          if [ "${{ env.NEXT_PUBLIC_SA_URL }}" = "CN" ]; then
+            echo $NEXT_PUBLIC_SA_URL
+            echo "It is OK."
+          elif [ "${{ env.NEXT_PUBLIC_SA_URL }}" != "CN" ]; then
+            echo "다시 생각해 봐야 함."
+          fi
           
       - name: Replace 'self_url' on testfile.html
         run: |
