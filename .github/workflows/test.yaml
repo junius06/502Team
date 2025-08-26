@@ -51,11 +51,11 @@ jobs:
 
       - name: verify CN ENV
         run: |
-          if [ "${{ env.NEXT_PUBLIC_SA_URL }}" = "CN" ]; then
+          if [ "${{ env.NEXT_PUBLIC_SA_URL }}" = ${{ secrets.NEXT_PUBLIC_SA_URL_CN }} ]; then
             echo $NEXT_PUBLIC_SA_URL
-            echo "It is OK."
-          elif [ "${{ env.NEXT_PUBLIC_SA_URL }}" != "CN" ]; then
-            echo "다시 생각해 봐야 함."
+            echo "Secrets CN"
+          elif [ "${{ env.NEXT_PUBLIC_SA_URL }}" != ${{ secrets.NEXT_PUBLIC_SA_URL_CN }} ]; then
+            echo "EU, US"
           fi
           
       - name: Replace 'self_url' on testfile.html
