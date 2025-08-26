@@ -35,7 +35,14 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v5
-      - name: Set and verify variables
+      - name: set url variables
+        run: |
+          if [ "${{ matrix.envs }}" = "dev-eu" ] || [ "${{ matrix.envs }}" = "dev-us" ]; then
+            URL="https://${{ matrix.envs }}-test.com"
+          elif [ "${{ matrix.envs }}" = "dev-cn" ]; then
+            URL="https://dev-test.cn"
+          fi
+      - name: verify variables
         run: |
           ENV_VAR_LIST=(NEXT_PUBLIC_ENVIRONMENT NEXT_PUBLIC_SA_URL)
           for ENV_VAR in "${ENV_VAR_LIST}"
@@ -49,7 +56,7 @@ jobs:
           done
       - name: Replace 'self_url' on testfile.html
         run: |
-          sed -i "s|{{self_url}}|${{ matrix.url }}|g" testfile.html
+          sed -i "s|{{self_url}}|$URL|g" testfile.html
           cat testfile.html
       - name: compression to artifacts
         run: tar -czf html.tar.gz testfile.html
