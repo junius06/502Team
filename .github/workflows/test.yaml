@@ -43,18 +43,10 @@ jobs:
           elif [ "${{ matrix.envs }}" = "dev-cn" ]; then
             echo "URL=https://dev-test.cn" >> $GITHUB_OUTPUT
           fi
-      - name: verify variables
+      - name: verify variables on package.json
         run: |
-          ENV_VAR_LIST=(NEXT_PUBLIC_ENVIRONMENT NEXT_PUBLIC_SA_URL)
-          for ENV_VAR in "${ENV_VAR_LIST}"
-          do
-            echo '::'_${ENV_VAR}
-            if [ -z "${!ENV_VAR}" ]; then
-              echo "${ENV_VAR} is empty"
-            else
-              echo "read ${ENV_VAR}"
-            fi
-          done
+          cat package.json | grep 'NEXT_PUBLIC_SA_URL'
+          
       - name: Replace 'self_url' on testfile.html
         run: |
           sed -i "s|{{self_url}}|${{ steps.devURL.outputs.URL }}|g" testfile.html
