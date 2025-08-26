@@ -47,7 +47,7 @@ jobs:
         if: matrix.envs == 'dev-cn'
         run: |
           echo "NEXT_PUBLIC_SA_URL=${{ secrets.NEXT_PUBLIC_SA_URL_CN }}" >> "$GITHUB_ENV"
-          grep -n "NEXT_PUBLIC_SA_URL=${{ secrets.NEXT_PUBLIC_SA_URL_CN }}
+          echo $NEXT_PUBLIC_SA_URL
 
       - name: verify CN ENV
         run: |
