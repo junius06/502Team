@@ -36,8 +36,8 @@ jobs:
         run: |
           case "${{ matrix.envs }}" in
             dev-eu|dev-us)
-              echo ${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}
-              echo ${{ secrets.NEXT_PUBLIC_SA_URL_CN }}
+              echo "NEXT_PUBLIC_ENVIRONMENT=${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}"
+              echo $NEXT_PUBLIC_ENVIRONMENT
               ;;
             dev-cn)
               echo "NEXT_PUBLIC_ENVIRONMENT=${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}" >> $GITHUB_ENV
