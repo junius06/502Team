@@ -115,7 +115,7 @@ jobs:
           path: |
             ./${{ env.ARTIFACT_NAME }}
 
-  prd-build:
+  build-prd:
     needs: [ artifacts-version ]
     runs-on: ubuntu-latest
     strategy:
