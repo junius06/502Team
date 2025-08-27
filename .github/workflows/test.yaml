@@ -232,12 +232,13 @@ jobs:
           export AWS_REGION=${AWS_REGION}
           export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
           export ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+          export ECR_REPOSITORY=${ECR_REPOSITORY}
 
           # 다음 step에서 변수 사용
           echo "ECR_REGISTRY=$ECR_REGISTRY" >> "$GITHUB_ENV"
           echo "AWS_REGION=$AWS_REGION" >> "$GITHUB_ENV"
 
-          echo "Resolved: ENV=$ENV, REGION=$AWS_REGION, REPO=$ECR_REPOSITORY, REGISTRY=$ECR_REGISTRY"
+          echo "Resolved: ENV=$ENV, REGION=$AWS_REGION, REGISTRY=$ECR_REGISTRY, REPO=$ECR_REPOSITORY"
 
       - name: Build docker image
         run: |
