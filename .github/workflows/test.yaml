@@ -239,7 +239,7 @@ jobs:
       - name: install aws-cli # self-hosted runner 에서는 불필요한 step
         run: | 
           sudo apt -y update
-          sudo apt -y install aws-cli
+          sudo apt -y install awscli
 
       - name: Configure AWS credentials
         run: |
