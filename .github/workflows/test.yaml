@@ -159,11 +159,11 @@ jobs:
             ./${{ env.ARTIFACT_NAME }}
 
   image-build:
-    needs: [ dev-build, stg-build ] # [ dev-build, stg-build, prd-build ]
+    needs: [ dev-build, stg-build, prd-build ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us] # [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
+        envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
     steps:
       - name: Download artifact version
         uses: actions/download-artifact@v4
@@ -204,19 +204,19 @@ jobs:
               esac
               ;;
 
-            # prd)
-            #   echo AWS_ACCESS_KEY_ID="${{ secrets.PRD_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-            #   echo AWS_SECRET_ACCESS_KEY="${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-            #   ECR_REPOSITORY='fmm-web-hnd'
-            #   AWS_REGION='eu-west-1'
-            #   ;;
+            prd)
+              echo AWS_ACCESS_KEY_ID="${{ secrets.PRD_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+              echo AWS_SECRET_ACCESS_KEY="${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+              ECR_REPOSITORY='fmm-web-hnd'
+              AWS_REGION='eu-west-1'
+              ;;
 
-            # prd-cn)
-            #   echo AWS_ACCESS_KEY_ID="${{ secrets.PRD_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-            #   echo AWS_SECRET_ACCESS_KEY="${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-            #   ECR_REPOSITORY='fmm-web-hnd'
-            #   AWS_REGION='ap-southeast-1'
-            #   ;;
+            prd-cn)
+              echo AWS_ACCESS_KEY_ID="${{ secrets.PRD_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+              echo AWS_SECRET_ACCESS_KEY="${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+              ECR_REPOSITORY='fmm-web-hnd'
+              AWS_REGION='ap-southeast-1'
+              ;;
 
             *)
               echo "Unknown matrix.envs: $ENV" >&2
@@ -244,7 +244,7 @@ jobs:
 
           echo ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com" >> "$GITHUB_ENV"
 
-          echo "Resolved: ENV=$ENV \nREGION=$AWS_REGION \nREGISTRY=$ECR_REGISTRY \nREPO=$ECR_REPOSITORY"
+          echo "Resolved: ENV=$ENV, REGION=$AWS_REGION, REGISTRY=$ECR_REGISTRY, REPO=$ECR_REPOSITORY"
 
       # - name: Login to Amazon ECR
       #   run: |
