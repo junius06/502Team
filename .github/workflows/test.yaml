@@ -229,17 +229,28 @@ jobs:
           esac
 
           # 현재 step에서 변수 사용
-          export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
-          export AWS_REGION=${AWS_REGION}          
-          export ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+          export AWS_REGION=${AWS_REGION}
           export ECR_REPOSITORY=${ECR_REPOSITORY}
 
           # 다음 step에서 변수 사용
-          echo "ECR_REGISTRY=$ECR_REGISTRY" >> "$GITHUB_ENV"
           echo "AWS_REGION=$AWS_REGION" >> "$GITHUB_ENV"
           echo "ECR_REPOSITORY=$ECR_REPOSITORY" >> "$GITHUB_ENV"
 
+      - name: Configure AWS credentials
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set region ${{ env.AWS_REGION }}
+
+          export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
+          # export ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com"
+          echo "ECR_REGISTRY=${AWS_ACCOUNT_ID}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com >> "$GITHUB_ENV"
+          
           echo "Resolved: ENV=$ENV, REGION=$AWS_REGION, REGISTRY=$ECR_REGISTRY, REPO=$ECR_REPOSITORY"
+
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
 
       - name: Build docker image
         run: |
