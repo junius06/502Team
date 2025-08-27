@@ -236,13 +236,6 @@ jobs:
           echo "AWS_REGION=$AWS_REGION" >> "$GITHUB_ENV"
           echo "ECR_REPOSITORY=$ECR_REPOSITORY" >> "$GITHUB_ENV"
 
-      - name: install aws-cli # self-hosted runner 에서는 불필요한 step
-        run: | 
-          # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          # unzip awscliv2.zip
-          # sudo ./aws/install
-          aws --version
-
       - name: Configure AWS credentials
         run: |
           aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }}
