@@ -236,6 +236,11 @@ jobs:
           echo "AWS_REGION=$AWS_REGION" >> "$GITHUB_ENV"
           echo "ECR_REPOSITORY=$ECR_REPOSITORY" >> "$GITHUB_ENV"
 
+      - name: install aws-cli # self-hosted runner 에서는 불필요한 step
+        run: | 
+          sudo apt -y update
+          sudo apt -y install aws-cli
+
       - name: Configure AWS credentials
         run: |
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
