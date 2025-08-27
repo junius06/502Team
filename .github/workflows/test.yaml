@@ -189,7 +189,7 @@ jobs:
             dev-*)
               echo AWS_ACCESS_KEY_ID="${{ secrets.STG_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
               echo AWS_SECRET_ACCESS_KEY="${{ secrets.STG_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-              echo ECR_REPOSITORY='fmm-web-hnd/dev'
+              ECR_REPOSITORY='fmm-web-hnd/dev'
               case "$ENV" in
                 dev-eu) AWS_REGION='eu-west-1' ;;
                 dev-us) AWS_REGION='us-west-2' ;;
@@ -200,7 +200,7 @@ jobs:
             stg-*)
               echo AWS_ACCESS_KEY_ID="${{ secrets.STG_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
               echo AWS_SECRET_ACCESS_KEY="${{ secrets.STG_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-              echo ECR_REPOSITORY='fmm-web-hnd/stg'
+              ECR_REPOSITORY='fmm-web-hnd/stg'
               case "$ENV" in
                 stg-eu) AWS_REGION='eu-west-1' ;;
                 stg-us) AWS_REGION='us-west-2' ;;
@@ -210,14 +210,14 @@ jobs:
             # prd)
             #   echo AWS_ACCESS_KEY_ID="${{ secrets.PRD_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
             #   echo AWS_SECRET_ACCESS_KEY="${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-            #   echo ECR_REPOSITORY="fmm-web-hnd" >> $GITHUB_ENV
+            #   ECR_REPOSITORY='fmm-web-hnd'
             #   AWS_REGION='eu-west-1'
             #   ;;
 
             # prd-cn)
             #   echo AWS_ACCESS_KEY_ID="${{ secrets.PRD_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
             #   echo AWS_SECRET_ACCESS_KEY="${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-            #   echo ECR_REPOSITORY="fmm-web-hnd" >> $GITHUB_ENV
+            #   ECR_REPOSITORY='fmm-web-hnd'
             #   AWS_REGION='ap-southeast-1'
             #   ;;
 
