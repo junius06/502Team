@@ -5,6 +5,8 @@ on:
 
 env:
   ARTIFACT_NAME: html.tar.gz
+  DOMAIN: test.com
+  DOMAIN_CN: test.cn
 
 jobs:
   artifacts-version:
@@ -15,23 +17,23 @@ jobs:
         run: echo "VERSION=TEST_$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
       - name: artifact version
         run: |
-          echo "${{ env.VERSION }}" > versions.txt
-          cat versions.txt
+          echo "${{ env.VERSION }}" > version.txt
+          cat version.txt
       - name: Upload artifact version
         uses: actions/upload-artifact@v4
         with:
-          name: versions
-          path: versions.txt
+          name: svc-version
+          path: |
+            version.txt
 
-  dev-build:
+  build-dev:
     needs: [ artifacts-version ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        envs: [dev-eu, dev-us, dev-cn]
+        envs: [ dev-eu, dev-us, dev-cn ]
     env:
       NEXT_PUBLIC_ENVIRONMENT: ${{ secrets.DEV_NEXT_PUBLIC_ENVIRONMENT }}
-      #NEXT_PUBLIC_SA_URL: ${{ secrets.NEXT_PUBLIC_SA_URL_CN }}
     steps:
       - name: checkout
         uses: actions/checkout@v5
@@ -39,9 +41,9 @@ jobs:
         id: devURL
         run: |
           if [ "${{ matrix.envs }}" = "dev-eu" ] || [ "${{ matrix.envs }}" = "dev-us" ]; then
-            echo "URL=https://${{ matrix.envs }}-test.com" >> $GITHUB_OUTPUT
+            echo "URL=https://${{ matrix.envs }}-${{ env.DOMAIN }}" >> $GITHUB_OUTPUT
           elif [ "${{ matrix.envs }}" = "dev-cn" ]; then
-            echo "URL=https://dev-test.cn" >> $GITHUB_OUTPUT
+            echo "URL=https://dev-${{ env.DOMAIN_CN }}" >> $GITHUB_OUTPUT
           fi
       - name: set CN-only env
         if: matrix.envs == 'dev-cn'
@@ -64,14 +66,14 @@ jobs:
           cat testfile.html
       - name: compression to artifacts
         run: tar -czf html.tar.gz testfile.html
-      - name: Upload artifact version
+      - name: upload artifact to code action repo
         uses: actions/upload-artifact@v4
         with:
           name: html-${{ matrix.envs }}
           path: |
             ./${{ env.ARTIFACT_NAME }}
 
-  stg-build:
+  build-stg:
     needs: [ artifacts-version ]
     runs-on: ubuntu-latest
     strategy:
@@ -86,7 +88,7 @@ jobs:
         id: stgURL
         run: |
           if [ "${{ matrix.envs }}" = "stg-eu" ] || [ "${{ matrix.envs }}" = "stg-us" ]; then
-            echo "URL=https://${{ matrix.envs }}-test.com" >> $GITHUB_OUTPUT
+            echo "URL=https://${{ matrix.envs }}-${{ env.DOMAIN }}" >> $GITHUB_OUTPUT
           fi
       - name: verify variables
         run: |
@@ -106,7 +108,7 @@ jobs:
           cat testfile.html
       - name: compression to artifacts
         run: tar -czf html.tar.gz testfile.html
-      - name: Upload artifact version
+      - name: upload artifact to code action repo
         uses: actions/upload-artifact@v4
         with:
           name: html-${{ matrix.envs }}
@@ -129,9 +131,9 @@ jobs:
         id: prdURL
         run: |
           if [ "${{ matrix.envs }}" = "prd" ]; then
-            echo "URL=https://test.com" >> $GITHUB_OUTPUT
+            echo "URL=https://${{ env.DOMAIN }}" >> $GITHUB_OUTPUT
           elif [ "${{ matrix.envs }}" = "prd-cn" ]; then
-            echo "URL=https://test.cn" >> $GITHUB_OUTPUT
+            echo "URL=https://${{ env.DOMAIN_CN }}" >> $GITHUB_OUTPUT
           fi
       - name: verify variables
         run: |
@@ -151,24 +153,31 @@ jobs:
           cat testfile.html
       - name: compression to artifacts
         run: tar -czf html.tar.gz testfile.html
-      - name: Upload artifact version
+      - name: upload artifact to code action repo
         uses: actions/upload-artifact@v4
         with:
           name: html-${{ matrix.envs }}
           path: |
             ./${{ env.ARTIFACT_NAME }}
 
-  image-build:
-    needs: [ dev-build, stg-build, prd-build ]
+  deploy:
+    needs: [ build-dev, build-stg, build-prd ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
     steps:
+      - name: Download WAR version
+        uses: actions/download-artifact@v4
+        with:
+          name: html-${{ matrix.envs }}
+          path: |
+            ./artifacts
+
       - name: Download artifact version
         uses: actions/download-artifact@v4
         with:
-          name: versions
+          name: svc-version
           path: |
             ./artifacts
 
@@ -253,9 +262,24 @@ jobs:
       - name: Build docker image
         run: |
           echo "Build docker image"
-          IMAGE_TAG=$(cat ./artifacts/versions.txt)
+          IMAGE_TAG=$(cat ./artifacts/version.txt)
           echo "Using version: $IMAGE_TAG"
 
-          # docker build -t ${{ env.ECR_STG_REGISTRY }}/${{ env.ECR_STG_REPOSITORY }}:$IMAGE_TAG .
-          # docker push ${{ env.ECR_STG_REGISTRY }}/${{ env.ECR_STG_REPOSITORY }}:$IMAGE_TAG
-          # echo "Image pushed: ${{ env.ECR_STG_REGISTRY }}/${{ env.ECR_STG_REPOSITORY }}:$IMAGE_TAG"
+          # docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG .
+          # docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+          # echo "Image pushed: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG"
+
+      # - name: CleanUp docker image
+      #   run: |
+      #     docker image prune
+
+  update-helm:
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact version
+        uses: actions/download-artifact@v4
+        with:
+          name: svc-version
+          path: |
+            ./artifacts
