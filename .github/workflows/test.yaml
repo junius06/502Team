@@ -161,9 +161,6 @@ jobs:
   image-build:
     needs: [ dev-build, stg-build ] # [ dev-build, stg-build, prd-build ]
     runs-on: ubuntu-latest
-    env:
-      ECR_STG_REGISTRY: 1234
-      ECR_STG_REPOSITORY: test
     strategy:
       matrix:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us] # [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
@@ -243,14 +240,15 @@ jobs:
           aws configure set region ${{ env.AWS_REGION }}
 
           export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
-          # export ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com"
-          echo ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com" >> "$GITHUB_ENV"
-          
-          echo "Resolved: ENV=$ENV, REGION=$AWS_REGION, REGISTRY=$ECR_REGISTRY, REPO=$ECR_REPOSITORY"
+          export ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com"
 
-      - name: Login to Amazon ECR
-        run: |
-          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+          echo ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com" >> "$GITHUB_ENV"
+
+          echo "Resolved: ENV=$ENV \nREGION=$AWS_REGION \nREGISTRY=$ECR_REGISTRY \nREPO=$ECR_REPOSITORY"
+
+      # - name: Login to Amazon ECR
+      #   run: |
+      #     aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
 
       - name: Build docker image
         run: |
