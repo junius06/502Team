@@ -276,8 +276,9 @@ jobs:
           echo "Image label=fmm=hnd:"; docker images --filter "label=fmm=hnd"
           echo ""
           echo "Docker images list:"; docker image ls
-          # docker image prune -af --filter "label=fmm=hnd" --filter "until=168h"
-          # echo "After prune:"; docker system df
+          sleep 15
+          docker image prune -af --filter "label=fmm=hnd" --filter "until=10s"
+          echo "After prune:"; docker system df; docker image ls
 
   update-helm:
     needs: [deploy]
