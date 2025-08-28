@@ -3,7 +3,7 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 # 패키지 정보만 먼저 복사하여 의존성 캐시 최적화
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json ./
 
 # 프로덕션 의존성만 설치
 RUN npm ci --omit=dev

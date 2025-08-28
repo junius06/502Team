@@ -278,6 +278,8 @@ jobs:
           echo "Build docker image"
           IMAGE_TAG=$(cat ./artifacts/version.txt)
           echo "Using version: $IMAGE_TAG"
+          
+          npm install
 
           docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG --label fmm=hnd .
           # docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
