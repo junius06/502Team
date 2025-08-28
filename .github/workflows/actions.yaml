@@ -189,24 +189,17 @@ jobs:
           ENV="${{ matrix.envs }}"
 
           case "$ENV" in
-            dev)
+            dev|stg)
               echo AWS_ACCESS_KEY_ID="${{ secrets.STG_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
               echo AWS_SECRET_ACCESS_KEY="${{ secrets.STG_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-              echo ECR_REPOSITORY="fmm-web-hnd/dev" >> "$GITHUB_ENV"
-              echo AWS_REGION="ap-northeast-2" >> "$GITHUB_ENV"
-              ;;
-
-            stg)
-              echo AWS_ACCESS_KEY_ID="${{ secrets.STG_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-              echo AWS_SECRET_ACCESS_KEY="${{ secrets.STG_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-              echo ECR_REPOSITORY="fmm-web-hnd/stg" >> "$GITHUB_ENV"
+              echo ECR_REPOSITORY="fmm-web-hnd/${{ matrix.envs }}" >> "$GITHUB_ENV"
               echo AWS_REGION="ap-northeast-2" >> "$GITHUB_ENV"
               ;;
 
             prd)
               echo AWS_ACCESS_KEY_ID="${{ secrets.PRD_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
               echo AWS_SECRET_ACCESS_KEY="${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-              echo ECR_REPOSITORY="fmm-web-hnd" >> "$GITHUB_ENV"
+              echo ECR_REPOSITORY="fmm-web-hnd/prd" >> "$GITHUB_ENV"
               echo AWS_REGION="ap-northeast-2" >> "$GITHUB_ENV"
               ;;
 
