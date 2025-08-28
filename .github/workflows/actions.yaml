@@ -282,14 +282,17 @@ jobs:
           npm install
 
           docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG --label fmm=hnd .
-          # docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
-          # echo "Image pushed: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG"
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+          echo "Image pushed: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG"
 
       - name: CleanUp docker images & cache
         if: always()
         run: |
           echo "Before prune:"; docker system df
-          docker images --filter "label=fmm=hnd"
+          echo ""
+          echo "Image label=fmm=hnd";
+          docker images --filter "label=fmm=hnd" \
+            --format 'table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.CreatedSince}}\t{{.Size}}\t{{.Label "fmm"}}'
           # docker image prune -af --filter "label=fmm=hnd" --filter "until=168h"
           # echo "After prune:"; docker system df
 
