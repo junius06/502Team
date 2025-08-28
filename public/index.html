@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, user-scalable=no"
+    />
+    <title>My Web App</title>
+    <style>
+      html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", Arial, sans-serif; }
+      .wrap { min-height: 100%; display: grid; place-items: center; background: #f6f7f9; }
+      .card { padding: 32px 40px; border-radius: 16px; background: white; box-shadow: 0 6px 24px rgba(0,0,0,.08); text-align: center; }
+      h1 { margin: 0 0 8px; font-size: 28px; }
+      p { margin: 0; color: #555; }
+      a { color: #2563eb; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .meta { margin-top: 16px; font-size: 14px; color: #777; }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <div class="card">
+        <h1>🚀 Node.js 웹 서버가 동작 중입니다!</h1>
+        <p>이 페이지는 <code>public/index.html</code>에서 제공됩니다.</p>
+        <div class="meta">헬스체크: <a href="/healthz">/healthz</a></div>
+      </div>
+    </main>
+  </body>
+</html>

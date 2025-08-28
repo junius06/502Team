@@ -167,7 +167,10 @@ jobs:
       matrix:
         envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
     steps:
-      - name: Download TAR
+      - name: checkout
+        uses: actions/checkout@v5
+
+      - name: Download TAR artifact
         uses: actions/download-artifact@v4
         with:
           name: html-${{ matrix.envs }}
@@ -243,9 +246,9 @@ jobs:
 
           echo "Resolved: ENV=$ENV, REGION=$AWS_REGION, REGISTRY=$ECR_REGISTRY, REPO=$ECR_REPOSITORY"
 
-      # - name: Login to Amazon ECR
-      #   run: |
-      #     aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
 
       - name: Build docker image
         run: |
@@ -253,13 +256,17 @@ jobs:
           IMAGE_TAG=$(cat ./artifacts/version.txt)
           echo "Using version: $IMAGE_TAG"
 
-          # docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG .
+          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG --label fmm=hnd .
           # docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
           # echo "Image pushed: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG"
 
-      # - name: CleanUp docker image
-      #   run: |
-      #     docker image prune
+      - name: CleanUp docker images & cache
+        if: always()
+        run: |
+          echo "Before prune:"; docker system df
+          docker images --filter "label=fmm=hnd"
+          # docker image prune -af --filter "label=fmm=hnd" --filter "until=168h"
+          # echo "After prune:"; docker system df
 
   update-helm:
     needs: [deploy]
