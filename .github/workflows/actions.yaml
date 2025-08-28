@@ -165,7 +165,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        envs: [dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
+        envs: [dev, stg, prd] #[dev-eu, dev-us, dev-cn, stg-eu, stg-us, prd, prd-cn]
     steps:
       - name: checkout
         uses: actions/checkout@v5
@@ -186,45 +186,28 @@ jobs:
 
       - name: Set aws variables # AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, ECR_REPOSITORY, ECR_REGISTRY
         run: |
-          # 에러 발생 시 즉시 중단
-          set -euo pipefail
-
           ENV="${{ matrix.envs }}"
 
           case "$ENV" in
-            dev-*)
+            dev)
               echo AWS_ACCESS_KEY_ID="${{ secrets.STG_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
               echo AWS_SECRET_ACCESS_KEY="${{ secrets.STG_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
               echo ECR_REPOSITORY="fmm-web-hnd/dev" >> "$GITHUB_ENV"
-              case "$ENV" in
-                dev-eu) echo AWS_REGION="eu-west-1" >> "$GITHUB_ENV" ;;
-                dev-us) echo AWS_REGION="us-west-2" >> "$GITHUB_ENV" ;;
-                dev-cn) echo AWS_REGION="ap-southeast-1" >> "$GITHUB_ENV" ;;
-              esac
+              echo AWS_REGION="ap-northeast-2" >> "$GITHUB_ENV"
               ;;
 
-            stg-*)
+            stg)
               echo AWS_ACCESS_KEY_ID="${{ secrets.STG_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
               echo AWS_SECRET_ACCESS_KEY="${{ secrets.STG_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
               echo ECR_REPOSITORY="fmm-web-hnd/stg" >> "$GITHUB_ENV"
-              case "$ENV" in
-                stg-eu) echo AWS_REGION="eu-west-1" >> "$GITHUB_ENV" ;;
-                stg-us) echo AWS_REGION="us-west-2" >> "$GITHUB_ENV" ;;
-              esac
+              echo AWS_REGION="ap-northeast-2" >> "$GITHUB_ENV"
               ;;
 
             prd)
               echo AWS_ACCESS_KEY_ID="${{ secrets.PRD_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
               echo AWS_SECRET_ACCESS_KEY="${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
               echo ECR_REPOSITORY="fmm-web-hnd" >> "$GITHUB_ENV"
-              echo AWS_REGION="eu-west-1" >> "$GITHUB_ENV"
-              ;;
-
-            prd-cn)
-              echo AWS_ACCESS_KEY_ID="${{ secrets.PRD_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-              echo AWS_SECRET_ACCESS_KEY="${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-              echo ECR_REPOSITORY="fmm-web-hnd" >> "$GITHUB_ENV"
-              echo AWS_REGION="ap-southeast-1" >> "$GITHUB_ENV"
+              echo AWS_REGION="ap-northeast-2" >> "$GITHUB_ENV"
               ;;
 
             *)
@@ -232,6 +215,53 @@ jobs:
               exit 1
               ;;
           esac
+
+          # # 에러 발생 시 즉시 중단
+          # set -euo pipefail
+
+          # ENV="${{ matrix.envs }}"
+
+          # case "$ENV" in
+          #   dev-*)
+          #     echo AWS_ACCESS_KEY_ID="${{ secrets.STG_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          #     echo AWS_SECRET_ACCESS_KEY="${{ secrets.STG_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          #     echo ECR_REPOSITORY="fmm-web-hnd/dev" >> "$GITHUB_ENV"
+          #     case "$ENV" in
+          #       dev-eu) echo AWS_REGION="eu-west-1" >> "$GITHUB_ENV" ;;
+          #       dev-us) echo AWS_REGION="us-west-2" >> "$GITHUB_ENV" ;;
+          #       dev-cn) echo AWS_REGION="ap-southeast-1" >> "$GITHUB_ENV" ;;
+          #     esac
+          #     ;;
+
+          #   stg-*)
+          #     echo AWS_ACCESS_KEY_ID="${{ secrets.STG_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          #     echo AWS_SECRET_ACCESS_KEY="${{ secrets.STG_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          #     echo ECR_REPOSITORY="fmm-web-hnd/stg" >> "$GITHUB_ENV"
+          #     case "$ENV" in
+          #       stg-eu) echo AWS_REGION="eu-west-1" >> "$GITHUB_ENV" ;;
+          #       stg-us) echo AWS_REGION="us-west-2" >> "$GITHUB_ENV" ;;
+          #     esac
+          #     ;;
+
+          #   prd)
+          #     echo AWS_ACCESS_KEY_ID="${{ secrets.PRD_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          #     echo AWS_SECRET_ACCESS_KEY="${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          #     echo ECR_REPOSITORY="fmm-web-hnd" >> "$GITHUB_ENV"
+          #     echo AWS_REGION="eu-west-1" >> "$GITHUB_ENV"
+          #     ;;
+
+          #   prd-cn)
+          #     echo AWS_ACCESS_KEY_ID="${{ secrets.PRD_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          #     echo AWS_SECRET_ACCESS_KEY="${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          #     echo ECR_REPOSITORY="fmm-web-hnd" >> "$GITHUB_ENV"
+          #     echo AWS_REGION="ap-southeast-1" >> "$GITHUB_ENV"
+          #     ;;
+
+          #   *)
+          #     echo "Unknown matrix.envs: $ENV" >&2
+          #     exit 1
+          #     ;;
+          # esac
 
       - name: Configure AWS credentials
         run: |

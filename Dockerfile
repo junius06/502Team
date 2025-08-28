@@ -11,6 +11,7 @@ RUN npm ci --omit=dev
 # 앱 소스 복사
 COPY server.js ./server.js
 COPY public ./public
+COPY testfile.html ./testfile.html
 
 # ---- Runtime stage (더 가벼운 이미지) ----
 FROM node:20-alpine AS runtime
