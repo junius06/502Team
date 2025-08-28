@@ -274,8 +274,7 @@ jobs:
           echo "Before prune:"; docker system df
           echo ""
           echo "Image label=fmm=hnd:";
-          docker images --filter "label=fmm=hnd" \
-            --format 'table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.CreatedSince}}\t{{.Size}}\t{{ index .Labels "fmm" }}'
+          docker images --filter "label=fmm=hnd"
           echo ""
           echo "Docker images list:"
           echo "docker image ls"
