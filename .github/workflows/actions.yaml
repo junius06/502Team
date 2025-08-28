@@ -273,9 +273,12 @@ jobs:
         run: |
           echo "Before prune:"; docker system df
           echo ""
-          echo "Image label=fmm=hnd";
+          echo "Image label=fmm=hnd:";
           docker images --filter "label=fmm=hnd" \
-            --format 'table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.CreatedSince}}\t{{.Size}}\t{{.Label "fmm"}}'
+            --format 'table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.CreatedSince}}\t{{.Size}}\t{{ index .Labels "fmm" }}'
+          echo ""
+          echo "Docker images list:"
+          echo "docker image ls"
           # docker image prune -af --filter "label=fmm=hnd" --filter "until=168h"
           # echo "After prune:"; docker system df
 
