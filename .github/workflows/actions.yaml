@@ -248,7 +248,7 @@ jobs:
           export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
           export ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com"
 
-          echo ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com" >> "$GITHUB_ENV"
+          echo ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.cr.${{ env.AWS_REGION }}.amazonaws.com" >> "$GITHUB_ENV"
 
           echo "Resolved: ENV=$ENV, REGION=$AWS_REGION, REGISTRY=$ECR_REGISTRY, REPO=$ECR_REPOSITORY"
 
@@ -268,16 +268,16 @@ jobs:
           docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
           echo "Image pushed: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG"
 
-      - name: CleanUp docker images & cache
+      - name: CleanUp docker images
         if: always()
         run: |
-          echo "Before prune:"; docker system df
+          echo "Before prune image list"; docker images ls --filter "label=fmm=hnd"
           echo ""
-          echo "Image label=fmm=hnd:"; docker images --filter "label=fmm=hnd"
-          echo ""
-          echo "Docker images list:"; docker image ls
           docker image prune -af --filter "label=fmm=hnd" --filter "until=168h"
-          echo "After prune:"; docker system df; docker image ls
+          echo ""
+          echo "After prune image list"; docker image ls --filter "label=fmm=hnd"
+          echo ""
+          echo "docker system check" && docker system df
 
   update-helm:
     needs: [deploy]
